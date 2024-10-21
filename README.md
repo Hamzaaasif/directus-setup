@@ -9,7 +9,10 @@ Please follow [DOCUMENTATION](https://docs.directus.io/extensions/creating-exten
 - tmp
 - uploads
 
-This will be used by directus and docker
+This will be used by directus and docker. The folder strucutre should look like this
+
+![image](https://github.com/user-attachments/assets/f2b053ef-7d7a-4e64-ab29-ca8303c5ff73)
+
 
 ## Running directus locally and build extension
 
