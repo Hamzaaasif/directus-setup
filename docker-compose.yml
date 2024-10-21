@@ -1,0 +1,130 @@
+version: "3.1"
+services:
+  database:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: "directus"
+      POSTGRES_PASSWORD: "directus"
+      POSTGRES_DB: "directus"
+      POSTGRES_HOST_AUTH_METHOD: "password"
+      POSTGRES_HOST: "0.0.0.0/0"
+    restart: always
+
+  cache:
+    image: redis:6
+
+  directus:
+    image: directus/directus:10.8.3
+    ports:
+      - 8055:8055
+    volumes:
+      - ./uploads:/directus/uploads
+      # If you want to load extensions from the host
+      - ./package.json:/directus/package.json
+      - ./extensions:/directus/extensions
+      - ./tmp:/directus/tmp
+      # - ./node_modules:/directus/node_modules
+    depends_on:
+      - cache
+      - database
+    env_file: .env
+    environment:
+      DATABASE_URL: "postgres://directus:directus@database/directus"
+      APP_ENV: "development" #production
+      APP_DEBUG: "false"
+      KEY: "jkajdDAsdjanubAtGmTUz9YcC"
+      SECRET: "shajnskjansjlnal2133CcsajnuanjiS"
+
+
+      PM2_INSTANCES : "1"
+      # The duration that the access token is valid ["15m"]
+      ACCESS_TOKEN_TTL: "15m"
+
+      # The duration that the refresh token is valid, and also how long users stay logged-in to the App ["7d"]
+      REFRESH_TOKEN_TTL: "7d"
+
+      # Whether or not to use a secure cookie for the refresh token in cookie mode [false]
+      REFRESH_TOKEN_COOKIE_SECURE: "false"
+
+      # Value for sameSite in the refresh token cookie when in cookie mode ["lax"]
+      REFRESH_TOKEN_COOKIE_SAME_SITE: "lax"
+
+      # Name of refresh token cookie ["directus_refresh_token"]
+      REFRESH_TOKEN_COOKIE_NAME: "directus_refresh_token"
+
+      # Which domain to use for the refresh cookie. Useful for development mode.
+      # REFRESH_TOKEN_COOKIE_DOMAIN
+
+      # The duration in milliseconds that a login request will be stalled for,
+      # and it should be greater than the time taken for a login request with an invalid password [500]
+      # LOGIN_STALL_TIME=500
+
+      # Whether or not to enable the CORS headers [false]
+      CORS_ENABLED: "true"
+
+      # Value for the Access-Control-Allow-Origin header. Use true to match the Origin header, or provide a domain or a CSV of domains for specific access [false]
+      CORS_ORIGIN: "true"
+
+      # Value for the Access-Control-Allow-Methods header [GET,POST,PATCH,DELETE]
+      CORS_METHODS: "GET,POST,PATCH,DELETE"
+
+      # Value for the Access-Control-Allow-Headers header [Content-Type,Authorization]
+      CORS_ALLOWED_HEADERS: "Content-Type,Authorization"
+
+      # Value for the Access-Control-Expose-Headers header [Content-Range]
+      CORS_EXPOSED_HEADERS: "Content-Range"
+
+      # Whether or not to send the Access-Control-Allow-Credentials header [true]
+      CORS_CREDENTIALS: "true"
+
+      # Value for the Access-Control-Max-Age header [18000]
+      CORS_MAX_AGE: "18000"
+
+      DB_CLIENT: "pg"
+      DB_HOST: "database"
+      DB_PORT: "5432"
+      DB_DATABASE: "directus"
+      DB_USER: "directus"
+      DB_PASSWORD: "directus"
+
+      CACHE_ENABLED: "false"
+      CACHE_STORE: "redis"
+      REDIS: "redis://cache:6379"
+
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "d1r3ctu5"
+
+      # IP or host the API listens on ["0.0.0.0"]
+      HOST: "0.0.0.0"
+
+      PUBLIC_URL: "http://localhost:8057/"
+      PUBLIC_HOST: "localhost:8057"
+
+      MAX_PAYLOAD_SIZE : "128mb"
+      # Whether or not to serve the Admin App under /admin. [true]
+      SERVE_APP: "true"
+
+      # Whether or not to enable GraphQL Introspection [true]
+      GRAPHQL_INTROSPECTION: "false"
+
+      RATE_LIMITER_ENABLED: "false"
+
+      STORAGE_LOCATIONS: "local"
+      STORAGE_LOCAL_DRIVER: "local"
+      STORAGE_LOCAL_ROOT: "./uploads"
+
+      ####################################################################################################
+      ### Extensions
+
+      # Path to your local extensions folder ["./extensions"]
+      EXTENSIONS_PATH: "./extensions"
+
+      # Automatically reload extensions when they have changed [false]
+      EXTENSIONS_AUTO_RELOAD: "TRUE"
+
+      PASSWORD_RESET_URL_ALLOW_LIST: "https://localhost:8055/set-password"
